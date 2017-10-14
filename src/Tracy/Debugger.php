@@ -8,6 +8,7 @@
 namespace Tracy;
 
 use ErrorException;
+use Nette\Utils\Strings;
 use Tracy;
 
 
@@ -306,7 +307,12 @@ class Debugger
 
 			if (Helpers::isHtmlMode()) {
 				$logged = empty($e);
-				require self::$errorTemplate ?: __DIR__ . '/assets/Debugger/error.500.phtml';
+				if (Strings::startsWith($exception->getMessage(), 'Allowed memory size of ')) {
+					echo '{"status":8}';
+					return;
+				}
+				echo '{"status":0}';
+				return;
 			} elseif (PHP_SAPI === 'cli') {
 				fwrite(STDERR, 'ERROR: application encountered an error and can not continue. '
 					. (isset($e) ? "Unable to log error.\n" : "Error was logged.\n"));
